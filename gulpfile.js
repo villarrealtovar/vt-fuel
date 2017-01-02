@@ -5,6 +5,7 @@ const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const browserSync = require('browser-sync').create();
 const eslint = require('gulp-eslint');
+//const jasmine = require('gulp-jasmine-phantom');
 //const mocha = require('gulp-mocha');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
@@ -22,10 +23,10 @@ gulp.task('default', ['copy-html', 'copy-images','styles', 'lint'], ()=>{
 		server: './dist'
 	});
 	
-	gulp.watch('./sass/**/*.scss',['styles']);
-	gulp.watch('./js/**/*.js',['lint']);
-	gulp.watch('./index.html', ['copy-html']);
-	gulp.watch('./img/*', ['copy-images']);
+	gulp.watch('./public/sass/**/*.scss',['styles']);
+	gulp.watch('./public/js/**/*.js',['lint']);
+	gulp.watch('./public/**/*.html', ['copy-html']);
+	gulp.watch('./public/img/*', ['copy-images']);
 	gulp.watch('./dist/index.html')
 		.on('change', browserSync.reload);
 
@@ -40,14 +41,14 @@ gulp.task('dist', [
 ]);
 
 gulp.task('scripts', ()=>{
-	gulp.src('js/**/*.js')
+	gulp.src('./public/js/**/*.js')
 		.pipe(babel())
 		.pipe(concat('all.js'))
 		.pipe(gulp.dest('./dist/js'));	
 });
 
 gulp.task('scripts-dist', ()=>{
-	gulp.src('js/**/*.js')
+	gulp.src('./public/js/**/*.js')
 		.pipe(babel())
 		.pipe(concat('all.js'))
 		.pipe(uglify())
@@ -75,12 +76,12 @@ gulp.task('lint', () => {
 
 
 gulp.task('copy-html', ()=>{
-	gulp.src('./index.html')
+	gulp.src('./public/index.html')
 		.pipe(gulp.dest('./dist'));
 });
 
 gulp.task('copy-images', ()=>{
-	gulp.src('./img/*')
+	gulp.src('./public/img/*')
 		.pipe(imagemin({
 			progressive: true,
 			use: [pngquant()]
