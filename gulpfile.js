@@ -14,15 +14,9 @@ const sourcemaps = require('gulp-sourcemaps');
 const imagemin = require('gulp-imagemin'); //losslessly compress JPEGs, GIFS, PNGs and SVGs 
 //Lossy compression
 const pngquant = require('imagemin-pngquant');
+const nodemon = require('gulp-nodemon');
 
-gulp.task('default', ['copy-html', 'copy-images','styles', 'lint'], ()=>{
-	browserSync.init({
-		watchOptions: {
-			usePolling: true
-		},
-		server: './dist'
-	});
-	
+gulp.task('default', ['browser-sync','copy-html', 'copy-images','styles', 'lint'], ()=>{
 	gulp.watch('./public/sass/**/*.scss',['styles']);
 	gulp.watch('./public/js/**/*.js',['lint']);
 	gulp.watch('./public/**/*.html', ['copy-html']);
@@ -31,6 +25,36 @@ gulp.task('default', ['copy-html', 'copy-images','styles', 'lint'], ()=>{
 		.on('change', browserSync.reload);
 
 });
+
+gulp.task('browser-sync', ['nodemon'], ()=>{
+	browserSync.init(null, {
+		proxy: 'http://192.168.1.150:3000',
+		watchOptions: {
+			usePolling: true
+		},
+		//server: './dist',
+		port: 7000
+	});
+});
+
+
+gulp.task('nodemon', function (cb) {
+	
+	var started = false;
+	
+	return nodemon({
+		script: 'server/server.js'
+	}).on('start', function () {
+		// to avoid nodemon being started multiple times
+		// thanks @matthisk
+		if (!started) {
+			cb();
+			started = true; 
+		} 
+	});
+});
+
+
 
 gulp.task('dist', [
 	'copy-html',
@@ -62,7 +86,7 @@ gulp.task('lint', () => {
     // So, it's best to have gulp ignore the directory as well. 
     // Also, Be sure to return the stream from the task; 
     // Otherwise, the task may end before the stream has finished. 
-	return gulp.src(['**/*.js','!node_modules/**'])
+	return gulp.src(['**/*.js','!node_modules/**', '!server/**'])
         // eslint() attaches the lint output to the "eslint" property 
         // of the file object so it can be used by other modules. 
         .pipe(eslint())

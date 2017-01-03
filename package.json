@@ -4,7 +4,12 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/server.js",
+    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha server/**/*.test.js",
+    "test-watch": "nodemon -L --exec \"npm test\""
+  },
+  "engines": {
+    "node": "6.9.1"
   },
   "author": "Jose Andres Villarreal Tovar",
   "license": "ISC",
@@ -19,10 +24,19 @@
     "gulp-eslint": "^3.0.1",
     "gulp-imagemin": "^3.1.1",
     "gulp-mocha": "^3.0.1",
+    "gulp-nodemon": "^2.2.1",
     "gulp-sass": "^3.0.0",
     "gulp-uglify": "^2.0.0",
     "imagemin-pngquant": "^5.0.0",
     "mocha": "^3.2.0",
+    "nodemon": "^1.11.0",
     "superagent": "^3.3.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "lodash": "^4.17.4",
+    "mongodb": "^2.2.16",
+    "mongoose": "^4.7.5"
   }
 }
