@@ -1,5 +1,3 @@
-'use strict';
-
 require('./config/config');
 
 const path = require('path');
@@ -9,20 +7,27 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 
+var {mongoose} = require('./db/mongoose');
+
+
 const port = process.env.PORT;
 const publicPath = path.join(__dirname, '../dist');
 
 var app = express();
+var {usersRouter} = require('./routes/users');
+
 app.use(bodyParser.json());
 app.use(express.static(publicPath));
 
 
 
+app.use('/users', usersRouter);
+
 
 
 app.get('*', (req, res)=>{
-	res.send('connected to Fuel Control App');
-	//res.render('index.html');
+	//res.send('connected to Fuel Control App');
+	res.render('index.html');
 });
 
 app.listen(port, ()=>{

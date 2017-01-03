@@ -1,1 +1,1 @@
-/vagrant/mongo/bin/./mongod --bind_ip=192.168.1.150 --dbpath=/home/vagrant/mongo-db/
+/vagrant/mongo/bin/./mongod --dbpath=/home/vagrant/mongo-db/
