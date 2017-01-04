@@ -9,7 +9,6 @@ const {ObjectID} = require('mongodb');
 
 var {mongoose} = require('./db/mongoose');
 
-
 const port = process.env.PORT;
 const publicPath = path.join(__dirname, '../dist');
 
@@ -18,12 +17,9 @@ var {usersRouter} = require('./routes/users');
 
 app.use(bodyParser.json());
 app.use(express.static(publicPath));
-
-
+app.set('views', __dirname + '../dist/');
 
 app.use('/users', usersRouter);
-
-
 
 app.get('*', (req, res)=>{
 	//res.send('connected to Fuel Control App');

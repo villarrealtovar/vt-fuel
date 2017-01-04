@@ -14,19 +14,11 @@ const sourcemaps = require('gulp-sourcemaps');
 const imagemin = require('gulp-imagemin'); //losslessly compress JPEGs, GIFS, PNGs and SVGs 
 //Lossy compression
 const pngquant = require('imagemin-pngquant');
-const nodemon = require('gulp-nodemon');
+//const nodemon = require('gulp-nodemon');
 
-gulp.task('default', ['browser-sync','copy-html', 'copy-images','styles', 'lint'], ()=>{
-	gulp.watch('./public/sass/**/*.scss',['styles']);
-	gulp.watch('./public/js/**/*.js',['lint']);
-	gulp.watch('./public/**/*.html', ['copy-html']);
-	gulp.watch('./public/img/*', ['copy-images']);
-	gulp.watch('./dist/index.html')
-		.on('change', browserSync.reload);
 
-});
+gulp.task('default', ['copy-html', 'copy-images','styles', 'lint'], ()=>{
 
-gulp.task('browser-sync', ['nodemon'], ()=>{
 	browserSync.init(null, {
 		proxy: 'http://192.168.1.150:3000',
 		watchOptions: {
@@ -35,9 +27,18 @@ gulp.task('browser-sync', ['nodemon'], ()=>{
 		//server: './dist',
 		port: 7000
 	});
+
+	gulp.watch('./public/sass/**/*.scss',['styles']);
+	gulp.watch('./public/js/**/*.js',['lint', 'scripts']);
+	gulp.watch('./public/**/*.html', ['copy-html']);
+	gulp.watch('./public/img/*', ['copy-images']);
+	gulp.watch('./dist/index.html')
+		.on('change', browserSync.reload);
+
 });
 
 
+/*
 gulp.task('nodemon', function (cb) {
 	
 	var started = false;
@@ -52,7 +53,7 @@ gulp.task('nodemon', function (cb) {
 			started = true; 
 		} 
 	});
-});
+});*/
 
 
 
@@ -64,17 +65,45 @@ gulp.task('dist', [
 	'scripts-dist'
 ]);
 
+
+gulp.task('libs', ()=>{
+	gulp.src(['./public/bower_components/angular/angular.min.js',
+		'./public/bower_components/bootstrap/dist/css/bootstrap.min.css'])
+	.pipe(gulp.dest('./dist/libs'));
+});
+
 gulp.task('scripts', ()=>{
 	gulp.src('./public/js/**/*.js')
-		.pipe(babel())
+		.pipe(babel({
+			presets: ['es2015']
+		}))
 		.pipe(concat('all.js'))
 		.pipe(gulp.dest('./dist/js'));	
+
+	gulp.src('./public/src/**/*.js')
+		.pipe(babel({
+			presets: ['es2015']
+		}))
+		.pipe(concat('app.js'))
+		.pipe(gulp.dest('./dist/js'));	
+
 });
 
 gulp.task('scripts-dist', ()=>{
 	gulp.src('./public/js/**/*.js')
-		.pipe(babel())
+		.pipe(babel({
+			presets: ['es2015']
+		}))
 		.pipe(concat('all.js'))
+		.pipe(uglify())
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest('./dist/js'));
+
+	gulp.src('./public/src/**/*.js')
+		.pipe(babel({
+			presets: ['es2015']
+		}))
+		.pipe(concat('app.js'))
 		.pipe(uglify())
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest('./dist/js'));
@@ -86,7 +115,8 @@ gulp.task('lint', () => {
     // So, it's best to have gulp ignore the directory as well. 
     // Also, Be sure to return the stream from the task; 
     // Otherwise, the task may end before the stream has finished. 
-	return gulp.src(['**/*.js','!node_modules/**', '!server/**', '!public/bower_components/**'])
+	return gulp.src(['**/*.js','!node_modules/**', '!server/**', 
+		'!public/bower_components/**', '!dist/**'])
         // eslint() attaches the lint output to the "eslint" property 
         // of the file object so it can be used by other modules. 
         .pipe(eslint())
@@ -115,7 +145,7 @@ gulp.task('copy-images', ()=>{
 
 
 gulp.task('styles', ()=>{
-	gulp.src('./sass/**/*.scss')
+	gulp.src('./public/sass/**/*.scss')
 		.pipe(sass({
 			outputStyle: 'compressed'
 		}).on('error', sass.logError))
